@@ -8,6 +8,16 @@ public class PlaceManager : MonoBehaviour
     [SerializeField] private ARRaycastManager arRaycastManager;
     [SerializeField] private GameObject indicatorPlane;
 
+    public static PlaceManager Instance { get; private set; }
+
+    public bool HasValidPos { get; private set; }
+    public Pose CurrentPose { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Update()
     {
         List<ARRaycastHit> hits = new List<ARRaycastHit>(); 
@@ -17,20 +27,22 @@ public class PlaceManager : MonoBehaviour
         //raycast dari titik tengah layar ke point cloud
         if (arRaycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
         {
-            Pose hitPose = hits[0].pose;
+            CurrentPose = hits[0].pose;
+            HasValidPos = true; 
 
             if (!indicatorPlane.activeSelf)
             {
                 indicatorPlane.SetActive(true);
             }
 
-            indicatorPlane.transform.SetPositionAndRotation(hitPose.position, hitPose.rotation);
+            indicatorPlane.transform.SetPositionAndRotation(CurrentPose.position, CurrentPose.rotation);
         }
         else
         {
             //kalau raycast tidak kena, sembunyikan indicatorPlane
             if (indicatorPlane.activeSelf)
             {
+                HasValidPos = false;
                 indicatorPlane.SetActive(false);
             }
         }
