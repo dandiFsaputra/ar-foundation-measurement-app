@@ -104,7 +104,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MaxDistance: 1.2
+    - _MaxDistance: 1.5
     - _Metallic: 0
     - _Noise: 0.08
     - _OcclusionStrength: 1
