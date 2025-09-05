@@ -99,3 +99,6 @@ InitTestScene*.unity*
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 /Assets/Samples/XR Interaction Toolkit/3.1.1/AR Starter Assets/Prefabs
 /Assets/Samples/XR Interaction Toolkit/3.1.1/AR Starter Assets/Prefabs
+Assets/Input.meta
+Assets/Samples/XR Interaction Toolkit/3.1.1/AR Starter Assets/Prefabs/XR Origin (AR Rig).prefab
+Assets/Samples/XR Interaction Toolkit/3.1.1/AR Starter Assets/Prefabs/XR Origin (AR Rig).prefab

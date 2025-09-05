@@ -393,6 +393,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RaycastPrefab: {fileID: 0}
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!114 &6837815617516819623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,6 +411,8 @@ MonoBehaviour:
       m_Calls: []
   m_PointCloudPrefab: {fileID: 2792823890343215039, guid: dffc81c28cf2fba4aa5b3dc043886b7d,
     type: 3}
+=======
+>>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
 =======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
 --- !u!1 &2512387470890420964
@@ -448,8 +451,11 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
 =======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
 =======
@@ -459,6 +465,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     serializedVersion: 3
@@ -539,6 +546,8 @@ PrefabInstance:
 =======
 =======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
+=======
+>>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
     m_TransformParent: {fileID: 2512387470890420967}
     m_Modifications:
     - target: {fileID: 774100038497631397, guid: 069266f272f67eb43b7e9423a4e669d2, type: 3}
@@ -599,6 +608,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6605111590819766859, guid: 069266f272f67eb43b7e9423a4e669d2, type: 3}
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
+=======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
 =======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
@@ -606,6 +618,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     m_RemovedGameObjects: []
@@ -649,6 +662,8 @@ Transform:
 =======
 =======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
+=======
+>>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
   m_SourcePrefab: {fileID: 100100000, guid: 069266f272f67eb43b7e9423a4e669d2, type: 3}
 --- !u!4 &2512387470319625118 stripped
 Transform:
@@ -656,6 +671,9 @@ Transform:
   m_PrefabInstance: {fileID: 8752705094176965077}
   m_PrefabAsset: {fileID: 0}
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
+=======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
 =======
 >>>>>>> parent of 8dd63bc (chore: configure project settings for Android and AR)
