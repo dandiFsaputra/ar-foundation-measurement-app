@@ -565,6 +565,21 @@ PrefabInstance:
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6605111590819766852, guid: 069266f272f67eb43b7e9423a4e669d2,
     type: 3}
+<<<<<<< Updated upstream
+=======
+  m_PrefabInstance: {fileID: 8752705094176965077}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6803edce0201f574f923fd9d10e5b30a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2512387470319625118 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6605111590819766859, guid: 069266f272f67eb43b7e9423a4e669d2,
+    type: 3}
+>>>>>>> Stashed changes
   m_PrefabInstance: {fileID: 8752705094176965077}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
