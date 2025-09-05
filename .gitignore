@@ -97,3 +97,5 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+/Assets/Samples/XR Interaction Toolkit/3.1.1/AR Starter Assets/Prefabs
+/Assets/Samples/XR Interaction Toolkit/3.1.1/AR Starter Assets/Prefabs
