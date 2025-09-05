@@ -7,15 +7,20 @@ public class MeasureManager : MonoBehaviour
 {
     [Header("Measure Manager Settings")]
     [SerializeField] private GameObject m_cubePrefab;
-    [SerializeField] private GameObject m_distanceUIPrefab;  // prefab canvas world space (sudah ada TMP text di dalamnya)
+    [SerializeField] private GameObject m_distanceUIPrefab;
     [SerializeField] private Camera m_arCamera;
 
     private PlayerInputActions m_playerInputActions;
-    private List<GameObject> m_cubes = new List<GameObject>();
-    private List<LineRenderer> m_lines = new List<LineRenderer>();
-    private List<GameObject> m_labels = new List<GameObject>();
-    private LineRenderer m_tempLine;
-    private GameObject m_tempLabel;
+    public List<GameObject> m_cubes = new List<GameObject>();
+    public List<LineRenderer> m_lines = new List<LineRenderer>();
+    public List<GameObject> m_labels = new List<GameObject>();
+    public LineRenderer m_tempLine;
+    public GameObject m_tempLabel;
+    public bool isDrawingEnabled = true;
+
+    // Variabel untuk mengelola segment
+    private GameObject m_currentSegmentStartCube; // Cube pertama di segment saat ini
+    private bool m_isNewSegment = true; // Flag untuk menandai segment baru
 
     private void Awake()
     {
@@ -44,15 +49,30 @@ public class MeasureManager : MonoBehaviour
         if (!PlaceManager.Instance.HasValidPos) return;
 
         Pose pose = PlaceManager.Instance.CurrentPose;
-
         GameObject newCube = Instantiate(m_cubePrefab, pose.position, Quaternion.identity);
         m_cubes.Add(newCube);
 
-        if (m_cubes.Count > 1)
+        // Jika ini adalah segment baru, set cube ini sebagai start untuk segment baru
+        if (m_isNewSegment)
         {
-            GameObject lastCube = m_cubes[m_cubes.Count - 2];
-            CreateLine(lastCube, newCube);
+            m_currentSegmentStartCube = newCube;
+            m_isNewSegment = false;
+
+            // Hapus garis sementara karena ini segment baru
+            if (m_tempLine != null) Destroy(m_tempLine.gameObject);
+            if (m_tempLabel != null) Destroy(m_tempLabel);
+            m_tempLine = null;
+            m_tempLabel = null;
         }
+        else
+        {
+            // Buat garis permanen hanya jika bukan segment baru
+            CreateLine(m_currentSegmentStartCube, newCube);
+            m_currentSegmentStartCube = newCube; // Set cube terbaru sebagai start untuk garis berikutnya
+        }
+
+        // Aktifkan drawing sementara untuk garis berikutnya
+        isDrawingEnabled = true;
     }
 
     private void CreateLine(GameObject start, GameObject end)
@@ -69,7 +89,6 @@ public class MeasureManager : MonoBehaviour
 
         m_lines.Add(line);
 
-        // langsung pakai prefab canvas world space kamu
         GameObject labelObj = Instantiate(m_distanceUIPrefab, lineObj.transform);
         m_labels.Add(labelObj);
 
@@ -84,7 +103,7 @@ public class MeasureManager : MonoBehaviour
 
     private void Update()
     {
-        // update semua line permanen
+        // Update semua line permanen
         for (int i = 0; i < m_lines.Count; i++)
         {
             LineRenderer line = m_lines[i];
@@ -92,36 +111,39 @@ public class MeasureManager : MonoBehaviour
 
             if (line == null || labelObj == null) continue;
 
-            Vector3 start = m_cubes[i].transform.position;
-            Vector3 end = m_cubes[i + 1].transform.position;
-
-            UpdateLine(line, start, end);
-
-            float distance = Vector3.Distance(start, end);
-
-            TextMeshProUGUI textUi = labelObj.GetComponentInChildren<TextMeshProUGUI>();
-            if (textUi != null)
+            // Cari cube start dan end untuk line ini
+            // Asumsi: setiap line menghubungkan m_cubes[i] dan m_cubes[i+1]
+            // (Ini perlu disesuaikan dengan logika pembuatan line Anda)
+            if (i < m_cubes.Count - 1)
             {
-                textUi.text = $"{distance:F2} m";
-            }
+                Vector3 start = m_cubes[i].transform.position;
+                Vector3 end = m_cubes[i + 1].transform.position;
 
-            // posisi di tengah (garis sudah fix)
-            Vector3 midPoint = (start + end) / 2;
-            float offset = 0.10f;
-            labelObj.transform.position = midPoint + Vector3.up * offset;
+                UpdateLine(line, start, end);
 
-            if (m_arCamera != null)
-            {
-                labelObj.transform.rotation = Quaternion.LookRotation(
-                    labelObj.transform.position - m_arCamera.transform.position
-                );
+                float distance = Vector3.Distance(start, end);
+
+                TextMeshProUGUI textUi = labelObj.GetComponentInChildren<TextMeshProUGUI>();
+                if (textUi != null)
+                    textUi.text = $"{distance:F2} m";
+
+                Vector3 midPoint = (start + end) / 2;
+                float offset = 0.10f;
+                labelObj.transform.position = midPoint + Vector3.up * offset;
+
+                if (m_arCamera != null)
+                {
+                    labelObj.transform.rotation = Quaternion.LookRotation(
+                        labelObj.transform.position - m_arCamera.transform.position
+                    );
+                }
             }
         }
 
-        // --- garis sementara (masih ditarik) ---
-        if (m_cubes.Count > 0 && PlaceManager.Instance.HasValidPos)
+        // Garis sementara dari cube terakhir di segment saat ini
+        if (isDrawingEnabled && m_currentSegmentStartCube != null && !m_isNewSegment && PlaceManager.Instance.HasValidPos)
         {
-            Vector3 start = m_cubes[m_cubes.Count - 1].transform.position;
+            Vector3 start = m_currentSegmentStartCube.transform.position;
             Vector3 end = PlaceManager.Instance.CurrentPose.position;
 
             if (m_tempLine == null)
@@ -143,13 +165,10 @@ public class MeasureManager : MonoBehaviour
 
             TextMeshProUGUI tempText = m_tempLabel.GetComponentInChildren<TextMeshProUGUI>();
             if (tempText != null)
-            {
                 tempText.text = $"{distance:F2} m";
-            }
 
-            // posisi di ujung (masih tarik)
-            float offset = 0.10f;
-            m_tempLabel.transform.position = end + Vector3.up * offset;
+            float offsetLabel = 0.10f;
+            m_tempLabel.transform.position = end + Vector3.up * offsetLabel;
 
             if (m_arCamera != null)
             {
@@ -158,5 +177,19 @@ public class MeasureManager : MonoBehaviour
                 );
             }
         }
+    }
+
+    // Method untuk memulai segment baru
+    public void StartNewSegment()
+    {
+        m_isNewSegment = true;
+        m_currentSegmentStartCube = null;
+        isDrawingEnabled = false;
+
+        // Hapus garis sementara
+        if (m_tempLine != null) Destroy(m_tempLine.gameObject);
+        if (m_tempLabel != null) Destroy(m_tempLabel);
+        m_tempLine = null;
+        m_tempLabel = null;
     }
 }
