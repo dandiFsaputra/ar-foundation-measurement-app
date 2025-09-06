@@ -9,9 +9,9 @@ using UnityEngine.InputSystem;
 public class MeasureManager : MonoBehaviour
 {
     [Header("Measure Manager Settings")]
-    [SerializeField] private GameObject m_cubePrefab; // Prefab untuk menandai titik awal dan akhir pengukuran
-    [SerializeField] private GameObject m_distanceUIPrefab; // Prefab untuk menampilkan ui angka jarak
-    [SerializeField] private Camera m_arCamera; // Kamera AR untuk orientasi UI
+    public GameObject m_cubePrefab; // Prefab untuk menandai titik awal dan akhir pengukuran
+    public GameObject m_distanceUIPrefab; // Prefab untuk menampilkan ui angka jarak
+    public Camera m_arCamera; // Kamera AR untuk orientasi UI
 
     private PlayerInputActions m_playerInputActions; // Input actions untuk menangani input pengguna (tap)
     private BaseMeasureMode currentMode; // Mode pengukuran saat ini
