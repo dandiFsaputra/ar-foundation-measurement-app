@@ -14,7 +14,58 @@ public class MeasureManager : MonoBehaviour
     [SerializeField] private Camera m_arCamera; // Kamera AR untuk orientasi UI
 
     private PlayerInputActions m_playerInputActions; // Input actions untuk menangani input pengguna (tap)
-     
+    private BaseMeasureMode currentMode; // Mode pengukuran saat ini
+
+    private void Awake()
+    {
+        m_playerInputActions = new PlayerInputActions();
+    }
+
+    private void OnEnable()
+    {
+        m_playerInputActions.Player.Enable();
+        m_playerInputActions.Player.Tap.performed += OnTapPerformed;
+    }
+
+    private void OnDisable()
+    {
+        m_playerInputActions.Player.Tap.performed -= OnTapPerformed;
+        m_playerInputActions.Player.Disable();
+    }
+
+    private void OnTapPerformed(InputAction.CallbackContext ctx)
+    {
+        if (PlaceManager.Instance.HasValidPos && currentMode != null)
+        {
+            Vector3 pos = PlaceManager.Instance.CurrentPose.position;
+            currentMode.OnTap(pos);
+        }
+    }
+
+    private void Update()
+    {
+        if (currentMode != null) currentMode.OnUpdate();
+    }
+
+    /// <summary>
+    /// dipanggil untuk mengganti mode pengukuran   
+    /// </summary>
+    /// <param name="mode"></param>
+    public void SetMode(BaseMeasureMode mode)
+    {
+        if (currentMode != null)
+        {
+            currentMode.OnExitMode();
+        }
+
+        currentMode = mode;
+
+        if (currentMode != null)
+        {
+            currentMode.OnEnterMode();
+        }
+    }
+
 
 
     //[Header("Measure Manager Settings")]
