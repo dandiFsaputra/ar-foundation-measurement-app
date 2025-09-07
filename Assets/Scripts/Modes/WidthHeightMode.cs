@@ -39,6 +39,7 @@ public class WidthHeightMode : BaseMeasureMode
         {
             // Tap pertama → cube awal
             m_startCube = GameObject.Instantiate(manager.m_cubePrefab, worldPos, Quaternion.identity);
+            manager.RegisterObject(m_startCube);
 
             // buat line sementara yang ketarik kamera
             GameObject lineObj = new GameObject("TempLine");
@@ -46,13 +47,16 @@ public class WidthHeightMode : BaseMeasureMode
             m_currentLine.material = new Material(Shader.Find("Sprites/Default"));
             m_currentLine.startWidth = m_currentLine.endWidth = 0.01f;
             m_currentLine.positionCount = 2;
+            manager.RegisterObject(lineObj);
 
             m_currentLabel = GameObject.Instantiate(manager.m_distanceUIPrefab, lineObj.transform);
+            manager.RegisterObject(m_currentLabel);
         }
         else if (m_endCube == null)
         {
             // Tap kedua → cube akhir + fix line
             m_endCube = GameObject.Instantiate(manager.m_cubePrefab, worldPos, Quaternion.identity);
+            manager.RegisterObject(m_endCube);
 
             // simpan line permanen
             m_lines.Add(m_currentLine);
@@ -100,5 +104,25 @@ public class WidthHeightMode : BaseMeasureMode
                 m_currentLabel.transform.rotation =
                     Quaternion.LookRotation(m_currentLabel.transform.position - manager.m_arCamera.transform.position);
         }
+
+        // selalu menghadap kamera
+        if (manager.m_arCamera != null)
+        {
+            foreach (var label in m_labels)
+            {
+                if (label != null)
+                {
+                    label.transform.rotation =
+                        Quaternion.LookRotation(label.transform.position - manager.m_arCamera.transform.position);
+                }
+            }
+
+            if (m_currentLabel != null)
+            {
+                m_currentLabel.transform.rotation =
+                    Quaternion.LookRotation(m_currentLabel.transform.position - manager.m_arCamera.transform.position);
+            }
+        }
+
     }
 }

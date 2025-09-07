@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -15,6 +16,10 @@ public class MeasureManager : MonoBehaviour
 
     private PlayerInputActions m_playerInputActions; // Input actions untuk menangani input pengguna (tap)
     private BaseMeasureMode currentMode; // Mode pengukuran saat ini
+
+    // Simpan semua cube & line yg dibuat dari semua mode
+    public List<GameObject> spawnedObjects = new List<GameObject>();
+
 
     private void Awake()
     {
@@ -35,10 +40,27 @@ public class MeasureManager : MonoBehaviour
 
     private void OnTapPerformed(InputAction.CallbackContext ctx)
     {
-        if (PlaceManager.Instance.HasValidPos && currentMode != null)
+        // --- IGNORE TAP WHEN POINTER IS ON UI ---
+        // Untuk mouse/editor:
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        // Untuk touch (mobile): cek setiap touch apakah berada pada UI
+        if (EventSystem.current != null && Input.touchCount > 0)
         {
-            Vector3 pos = PlaceManager.Instance.CurrentPose.position;
-            currentMode.OnTap(pos);
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(i).fingerId))
+                    return;
+            }
+        }
+        // ------------------------------------------
+
+        // pastikan ada mode aktif dan ada posisi valid dari PlaceManager
+        if (currentMode != null && PlaceManager.Instance != null && PlaceManager.Instance.HasValidPos)
+        {
+            Vector3 worldPos = PlaceManager.Instance.CurrentPose.position;
+            currentMode.OnTap(worldPos);
         }
     }
 
@@ -65,6 +87,29 @@ public class MeasureManager : MonoBehaviour
             currentMode.OnEnterMode();
         }
     }
+
+    /// <summary>
+    /// Fungsi untuk mendaftarkan object baru (cube/line) ke daftar
+    /// </summary>
+    public void RegisterObject(GameObject obj)
+    {
+        if (!spawnedObjects.Contains(obj))
+            spawnedObjects.Add(obj);
+    }
+
+    /// <summary>
+    /// Fungsi untuk hapus semua cube & line
+    /// </summary>
+    public void ResetAll()
+    {
+        foreach (var obj in spawnedObjects)
+        {
+            if (obj != null) Destroy(obj);
+        }
+        spawnedObjects.Clear();
+    }
+
+
 
 
 

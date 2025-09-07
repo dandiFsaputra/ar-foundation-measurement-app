@@ -7,7 +7,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MeasureModeData", menuName = "Scriptable Objects/MeasureModeData")]
 public class MeasureModeData : ScriptableObject
 {
-    public enum ModeType { WidthHeight }
+    public enum ModeType 
+    { 
+        WidthHeight, 
+        Polyline,
+        Angle
+    }
 
     [Header("Mode Properties")]
     public ModeType modeType;
