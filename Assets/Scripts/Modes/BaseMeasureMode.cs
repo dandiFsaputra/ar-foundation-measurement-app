@@ -4,7 +4,7 @@ using UnityEngine;
 /// Base class (abstract) untuk semua mode pengukuran.
 /// semua mode akan inheritensi dari class ini supaya punya fungsi yang sama
 /// </summary>
-public abstract class BaseMeasureMode : MonoBehaviour
+public abstract class BaseMeasureMode
 {
     protected MeasureManager manager; // Reference ke MeasureManager
 
@@ -27,7 +27,7 @@ public abstract class BaseMeasureMode : MonoBehaviour
     /// dipanggil saat user tap di layar
     /// </summary>
     /// <param name="position"></param>
-    public abstract void OnTap(Vector3 position);
+    public abstract void OnTap(Vector3 worldPos);
 
     /// <summary>
     /// dipanggil di update untuk behavior yang perlu diupdate terus menerus

@@ -18,11 +18,15 @@ public class MeasureModeManager : MonoBehaviour
         foreach (var data in modeDataList)
         {
             GameObject btnObj = Instantiate(modeButtonPrefab, modePanelParent);
-            // Set text & icon
+
             btnObj.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = data.modeName;
             btnObj.GetComponentInChildren<Image>().sprite = data.icon;
 
+            var button = btnObj.GetComponent<Button>();
+            MeasureModeData capturedData = data;
+            button.onClick.AddListener(() => OnModeSelected(capturedData));
         }
+
     }
 
     public void OnModeSelected(MeasureModeData data)

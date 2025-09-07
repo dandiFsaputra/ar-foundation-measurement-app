@@ -1,18 +1,18 @@
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
 
-/// <summary>
-/// mode untuk mengukur lebar dan tinggi (cuma 2 titik dan 1 garis)
-///</summary>>
 public class WidthHeightMode : BaseMeasureMode
 {
     private GameObject m_startCube;
     private GameObject m_endCube;
-    private LineRenderer m_lineRenderer;
-    private GameObject m_label;
+    private LineRenderer m_currentLine;
+    private GameObject m_currentLabel;
 
-    public WidthHeightMode(MeasureManager manager) : base(manager)
-    {
-    }
+    // simpan semua garis permanen
+    private List<LineRenderer> m_lines = new List<LineRenderer>();
+    private List<GameObject> m_labels = new List<GameObject>();
+
+    public WidthHeightMode(MeasureManager manager) : base(manager) { }
 
     public override void OnEnterMode()
     {
@@ -22,65 +22,83 @@ public class WidthHeightMode : BaseMeasureMode
     public override void OnExitMode()
     {
         Debug.Log("Exit WidthHeight Mode");
-        if (m_lineRenderer != null) GameObject.Destroy(m_lineRenderer.gameObject);
-        if (m_label != null) GameObject.Destroy(m_label);
+
+        // kalau mau clear semua line lama, uncomment ini:
+        // foreach (var line in m_lines) GameObject.Destroy(line.gameObject);
+        // foreach (var label in m_labels) GameObject.Destroy(label);
+
         m_startCube = null;
         m_endCube = null;
+        m_currentLine = null;
+        m_currentLabel = null;
     }
 
-    public override void OnTap(Vector3 position)
+    public override void OnTap(Vector3 worldPos)
     {
         if (m_startCube == null)
         {
-            // place start cube
-            m_startCube = GameObject.Instantiate(manager.m_cubePrefab, position, Quaternion.identity);
+            // Tap pertama → cube awal
+            m_startCube = GameObject.Instantiate(manager.m_cubePrefab, worldPos, Quaternion.identity);
+
+            // buat line sementara yang ketarik kamera
+            GameObject lineObj = new GameObject("TempLine");
+            m_currentLine = lineObj.AddComponent<LineRenderer>();
+            m_currentLine.material = new Material(Shader.Find("Sprites/Default"));
+            m_currentLine.startWidth = m_currentLine.endWidth = 0.01f;
+            m_currentLine.positionCount = 2;
+
+            m_currentLabel = GameObject.Instantiate(manager.m_distanceUIPrefab, lineObj.transform);
         }
         else if (m_endCube == null)
         {
-            // place end cube and create line
-            m_endCube = GameObject.Instantiate(manager.m_cubePrefab, position, Quaternion.identity);
-            GameObject lineObj = new GameObject("WidthHeightLine");
-            m_lineRenderer = lineObj.AddComponent<LineRenderer>();
-            m_lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-            m_lineRenderer.startWidth = m_lineRenderer.endWidth = 0.01f;
-            m_lineRenderer.positionCount = 2;
+            // Tap kedua → cube akhir + fix line
+            m_endCube = GameObject.Instantiate(manager.m_cubePrefab, worldPos, Quaternion.identity);
 
-            m_label = GameObject.Instantiate(manager.m_distanceUIPrefab, m_lineRenderer.transform);
-        }
-        else
-        {
-            // reset
-            OnExitMode();
-            OnTap(position);
+            // simpan line permanen
+            m_lines.Add(m_currentLine);
+            m_labels.Add(m_currentLabel);
+
+            // reset state supaya siap bikin line baru
+            m_startCube = null;
+            m_endCube = null;
+            m_currentLine = null;
+            m_currentLabel = null;
         }
     }
 
     public override void OnUpdate()
     {
-        if (m_startCube != null && m_endCube != null && m_lineRenderer != null)
+        // Update line sementara (kalau ada)
+        if (m_startCube != null && m_currentLine != null)
         {
-            // update line
             Vector3 start = m_startCube.transform.position;
-            Vector3 end = m_endCube.transform.position;
-            m_lineRenderer.SetPosition(0, start);
-            m_lineRenderer.SetPosition(1, end);
+            Vector3 end;
 
-            // update label
-            float distance = Vector3.Distance(start, end);
-            var text = m_label.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-            if (text != null)
+            if (m_endCube == null)
             {
-                text.text = $"{distance:F2} m";
+                // kalau cube akhir belum ada → tarik ke posisi kamera/pose AR
+                end = PlaceManager.Instance.CurrentPose.position;
             }
+            else
+            {
+                // kalau cube akhir udah ada → fix di posisinya
+                end = m_endCube.transform.position;
+            }
+
+            m_currentLine.SetPosition(0, start);
+            m_currentLine.SetPosition(1, end);
+
+            float distance = Vector3.Distance(start, end);
+            var text = m_currentLabel.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (text != null)
+                text.text = $"{distance:F2} m";
 
             Vector3 mid = (start + end) / 2;
-            m_label.transform.position = mid + Vector3.up * 0.1f;
+            m_currentLabel.transform.position = mid + Vector3.up * 0.05f;
 
             if (manager.m_arCamera != null)
-            {
-                m_label.transform.rotation = Quaternion.LookRotation(m_label.transform.position - manager.m_arCamera.transform.position);
-            }
+                m_currentLabel.transform.rotation =
+                    Quaternion.LookRotation(m_currentLabel.transform.position - manager.m_arCamera.transform.position);
         }
     }
-
 }
