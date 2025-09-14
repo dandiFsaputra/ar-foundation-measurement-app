@@ -3,18 +3,18 @@ using UnityEngine;
 
 public class RectangleMode : BaseMeasureMode
 {
-    private List<GameObject> m_cubes = new List<GameObject>(); // 1–4
-    private List<LineRenderer> m_lines = new List<LineRenderer>();
-    private List<GameObject> m_labels = new List<GameObject>();
+    private readonly List<GameObject> m_cubes = new();
+    private readonly List<LineRenderer> m_lines = new();
+    private readonly List<GameObject> m_labels = new();
 
-    private int m_stage = 0; // 0=no cube, 1=1 cube, 2=2 cube, 3=rectangle fix
+    private int m_stage = 0;
 
     public RectangleMode(MeasureManager manager) : base(manager) { }
 
     public override void OnEnterMode()
     {
         Debug.Log("Enter Rectangle Mode");
-        m_stage = 0;
+        ResetState();
     }
 
     public override void OnExitMode()
@@ -27,43 +27,33 @@ public class RectangleMode : BaseMeasureMode
     {
         if (m_stage == 0)
         {
-            // Tap pertama → cube1
-            var cube1 = GameObject.Instantiate(manager.m_cubePrefab, worldPos, Quaternion.identity);
+            var cube1 = SpawnCube(worldPos);
             m_cubes.Add(cube1);
-            manager.RegisterObject(cube1);
 
             m_stage = 1;
         }
         else if (m_stage == 1)
         {
-            // Tap kedua → cube2
-            var cube2 = GameObject.Instantiate(manager.m_cubePrefab, worldPos, Quaternion.identity);
+            var cube2 = SpawnCube(worldPos);
             m_cubes.Add(cube2);
-            manager.RegisterObject(cube2);
 
-            // Spawn cube3 & cube4 sementara
-            var cube3 = GameObject.Instantiate(manager.m_cubePrefab, cube2.transform.position, Quaternion.identity);
-            var cube4 = GameObject.Instantiate(manager.m_cubePrefab, m_cubes[0].transform.position, Quaternion.identity);
+            var cube3 = SpawnCube(worldPos);
+            var cube4 = SpawnCube(m_cubes[0].transform.position);
 
             m_cubes.Add(cube3);
             m_cubes.Add(cube4);
 
-            manager.RegisterObject(cube3);
-            manager.RegisterObject(cube4);
-
-            m_stage = 2; // sekarang cube3 & 4 masih gerak
+            m_stage = 2;
         }
         else if (m_stage == 2)
         {
-            // Tap ketiga → fix rectangle
             CreateRectangleLines();
             m_stage = 3;
         }
         else if (m_stage == 3)
         {
-            // Mulai rectangle baru tanpa hapus yang lama
             ResetState();
-            OnTap(worldPos); // langsung treat tap sebagai tap pertama rectangle baru
+            OnTap(worldPos);
         }
     }
 
@@ -71,81 +61,60 @@ public class RectangleMode : BaseMeasureMode
     {
         if (m_stage == 1 && PlaceManager.Instance.HasValidPos)
         {
-            // Update line dummy dari cube1 ke kamera
-            Vector3 start = m_cubes[0].transform.position;
-            Vector3 end = PlaceManager.Instance.CurrentPose.position;
-            Debug.DrawLine(start, end, Color.yellow);
+            Debug.DrawLine(m_cubes[0].transform.position, PlaceManager.Instance.CurrentPose.position, Color.yellow);
         }
 
         if (m_stage == 2 && PlaceManager.Instance.HasValidPos)
         {
-            // Update posisi cube3 & cube4 sesuai arah kamera
-            Vector3 c1 = m_cubes[0].transform.position;
-            Vector3 c2 = m_cubes[1].transform.position;
-
-            Vector3 dir = (c2 - c1).normalized;
-            Vector3 camDir = (manager.m_arCamera.transform.position - c1).normalized;
-
-            // ambil cross product untuk vector tegak lurus bidang
-            Vector3 perp = Vector3.Cross(dir, Vector3.up).normalized;
-            if (Vector3.Dot(perp, camDir) < 0) perp = -perp; // pilih arah sesuai kamera
-
-            float length = Vector3.Distance(c1, c2);
-
-            m_cubes[2].transform.position = c2 + perp * length;
-            m_cubes[3].transform.position = c1 + perp * length;
+            UpdateDynamicCubes();
         }
 
-        // Label selalu ngadep kamera
-        if (manager.m_arCamera != null)
-        {
-            foreach (var label in m_labels)
-            {
-                if (label != null)
-                {
-                    label.transform.rotation = Quaternion.LookRotation(
-                        label.transform.position - manager.m_arCamera.transform.position
-                    );
-                }
-            }
-        }
+        foreach (var label in m_labels) FaceToCamera(label);
+    }
+
+    // ---------- SPAWN & UPDATE ----------
+
+    private GameObject SpawnCube(Vector3 pos)
+    {
+        var cube = GameObject.Instantiate(manager.m_cubePrefab, pos, Quaternion.identity);
+        manager.RegisterObject(cube);
+        return cube;
     }
 
     private void CreateRectangleLines()
     {
-        // Bikin line permanen + label
         for (int i = 0; i < 4; i++)
         {
             int next = (i + 1) % 4;
 
-            GameObject lineObj = new GameObject($"Line_{i}");
-            var line = lineObj.AddComponent<LineRenderer>();
-            line.material = new Material(Shader.Find("Sprites/Default"));
-            line.startWidth = line.endWidth = 0.01f;
-            line.positionCount = 2;
-            line.SetPosition(0, m_cubes[i].transform.position);
-            line.SetPosition(1, m_cubes[next].transform.position);
-
-            manager.RegisterObject(lineObj);
+            var line = CreateLine($"Line_{i}");
+            UpdateLine(line, m_cubes[i].transform.position, m_cubes[next].transform.position);
             m_lines.Add(line);
 
-            var label = GameObject.Instantiate(manager.m_distanceUIPrefab, lineObj.transform);
+            var label = CreateLabel(Vector3.zero, "0.00 m");
             UpdateLabel(label, m_cubes[i].transform.position, m_cubes[next].transform.position);
             m_labels.Add(label);
-            manager.RegisterObject(label);
         }
     }
 
-    private void UpdateLabel(GameObject label, Vector3 start, Vector3 end)
+    private void UpdateDynamicCubes()
     {
-        float distance = Vector3.Distance(start, end);
-        var text = label.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-        if (text != null)
-            text.text = $"{distance:F2} m";
+        Vector3 c1 = m_cubes[0].transform.position;
+        Vector3 c2 = m_cubes[1].transform.position;
 
-        Vector3 mid = (start + end) / 2;
-        label.transform.position = mid + Vector3.up * 0.05f;
+        Vector3 dir = (c2 - c1).normalized;
+        Vector3 camDir = (manager.m_arCamera.transform.position - c1).normalized;
+
+        Vector3 perp = Vector3.Cross(dir, Vector3.up).normalized;
+        if (Vector3.Dot(perp, camDir) < 0) perp = -perp;
+
+        float length = Vector3.Distance(c1, c2);
+
+        m_cubes[2].transform.position = c2 + perp * length;
+        m_cubes[3].transform.position = c1 + perp * length;
     }
+
+    // ---------- RESET ----------
 
     private void ResetState()
     {
