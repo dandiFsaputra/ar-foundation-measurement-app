@@ -14,11 +14,13 @@ public class MeasureModeManager : MonoBehaviour
     public Button widthHeightButton;
     public Button polylineButton;
     public Button angleButton;
+    public Button rectangleButton;
 
     [Header("Mode Data")]
     public MeasureModeData widthHeightData;
     public MeasureModeData polylineData;
     public MeasureModeData angleData;
+    public MeasureModeData rectangleData;
 
     private void Start()
     {
@@ -39,6 +41,12 @@ public class MeasureModeManager : MonoBehaviour
         {
             angleButton.onClick.AddListener(() => OnModeSelected(angleData));
             SetButtonText(angleButton, angleData.modeName);
+        }
+
+        if (rectangleButton != null && rectangleData != null)
+        {
+            rectangleButton.onClick.AddListener(() => OnModeSelected(rectangleData));
+            SetButtonText(rectangleButton, rectangleData.modeName);
         }
     }
 
@@ -69,6 +77,9 @@ public class MeasureModeManager : MonoBehaviour
 
             case MeasureModeData.ModeType.Angle:
                 return new AngleMode(measureManager);
+
+            case MeasureModeData.ModeType.Rectangle:
+                return new RectangleMode(measureManager);
 
             default:
                 Debug.LogWarning("Mode type belum di-handle: " + data.modeType);

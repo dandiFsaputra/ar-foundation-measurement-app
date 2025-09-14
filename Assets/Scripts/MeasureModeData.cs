@@ -11,7 +11,8 @@ public class MeasureModeData : ScriptableObject
     { 
         WidthHeight, 
         Polyline,
-        Angle
+        Angle,
+        Rectangle
     }
 
     [Header("Mode Properties")]
