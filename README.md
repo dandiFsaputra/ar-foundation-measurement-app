@@ -8,5 +8,5 @@
 
 # 💖 Support the Project
 Thank you so much already for using my projects! If you want to go a step further and support my open source work, buy me a coffee:
-https://saweria.co/Dandifsaputra
+https://saweria.co/Dandifsaputra <br>
 To support the project directly, feel free to open issues for icon suggestions, or contribute with a pull request!
