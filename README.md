@@ -7,6 +7,4 @@
 
 
 
-![Screenshot_20250914-135437_ar-measurement-app](https://github.com/user-attachments/assets/ea44ec03-1c65-40a6-8709-1d903c2139f9)
-![Screenshot_20250914-135234_ar-measurement-app](https://github.com/user-attachments/assets/86483c6e-f167-4640-b43f-b591b5d4541b)
-
+<img width="2400" height="1842" alt="tes" src="https://github.com/user-attachments/assets/b898e2c6-8cde-42df-b7be-bfbe157aeadc" />
