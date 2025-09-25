@@ -15,6 +15,11 @@ public class SessionManager : MonoBehaviour
       arPlaneManager = FindAnyObjectByType<ARPlaneManager>();
    }
 
+   void Start()
+   {
+      HandleUiInfoAr();
+   }
+
    void OnEnable()
    {
       arPlaneManager.trackablesChanged.AddListener(OnPlanesChanged);

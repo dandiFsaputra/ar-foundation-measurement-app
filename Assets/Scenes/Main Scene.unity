@@ -3855,7 +3855,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SessionManager
   uiScanningPanel: {fileID: 2002079114}
   textInfo: {fileID: 943281456}
-  requiredPlaneCount: 4
+  requiredPlaneCount: 3
 --- !u!1 &1491729974
 GameObject:
   m_ObjectHideFlags: 0
