@@ -387,7 +387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7259f7f3efeefdb4ebcf7920c02c6c9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_cubePrefab: {fileID: 4935472365215478628, guid: 365cc53f2e8315d45a8ff1fffa0d3dc5,
+  m_cubePrefab: {fileID: 2268320015456569960, guid: 429a4b439ff1ee735a4a51976a34971e,
     type: 3}
   m_distanceUIPrefab: {fileID: 8414249881878026026, guid: 094f809b719f27c488ba4c96e12529fb,
     type: 3}
@@ -458,7 +458,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &248888763
 RectTransform:
   m_ObjectHideFlags: 0
@@ -500,8 +500,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: debug
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 55149c7aff7071f85be4fe9c4f281d9c, type: 2}
+  m_sharedMaterial: {fileID: 3022633246132892610, guid: 55149c7aff7071f85be4fe9c4f281d9c,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3855,7 +3856,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SessionManager
   uiScanningPanel: {fileID: 2002079114}
   textInfo: {fileID: 943281456}
-  requiredPlaneCount: 4
+  requiredPlaneCount: 3
   speedThreshold: 3
   rotationThreshold: 100
   showDuration: 1
