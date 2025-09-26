@@ -18,9 +18,10 @@ public class SessionManager : MonoBehaviour
    public bool IsReadyToPlace { get; set; }
    public ARPlaneManager ArPlaneManager { get; set; }
 
-   private Vector3 lasPosition;
+   private Vector3 lastPosition;
    private quaternion lastRotation;
    private float timer;
+   private bool isWarningActive;
 
    void Awake()
    {
@@ -34,7 +35,7 @@ public class SessionManager : MonoBehaviour
 
       if (Camera.main != null)
       {
-         lasPosition = Camera.main.transform.position;
+         lastPosition = Camera.main.transform.position;
          lastRotation = Camera.main.transform.rotation;
       }
    }
@@ -51,7 +52,9 @@ public class SessionManager : MonoBehaviour
 
    private void OnPlanesChanged(ARTrackablesChangedEventArgs<ARPlane> args)
    {
-      HandleUiInfoAr();
+      // hanya update teks kalau tidak sedang warning
+      if (!isWarningActive)
+         HandleUiInfoAr();
    }
 
    void Update()
@@ -59,26 +62,29 @@ public class SessionManager : MonoBehaviour
       if (Camera.main == null) return;
 
       Transform cam = Camera.main.transform;
-      float speed = (cam.position - lasPosition).magnitude / Time.deltaTime;
-
+      float speed = (cam.position - lastPosition).magnitude / Time.deltaTime;
       float angle = Quaternion.Angle(cam.rotation, lastRotation);
       float angularSpeed = angle / Time.deltaTime;
 
       if (speed > speedThreshold || angularSpeed > rotationThreshold)
       {
+         textInfo.gameObject.SetActive(true);
          textInfo.text = "Pergerakan kamera terlalu cepat, coba gerakan perlahan";
          timer = showDuration;
+         isWarningActive = true;
       }
 
-      if (timer > 0)
+      if (isWarningActive)
       {
          timer -= Time.deltaTime;
          if (timer <= 0)
          {
-            HandleUiInfoAr();
+            isWarningActive = false;
+            HandleUiInfoAr(); // balikin ke teks scanning
          }
       }
-      lasPosition = cam.position;
+
+      lastPosition = cam.position;
       lastRotation = cam.rotation;
    }
 
@@ -87,19 +93,15 @@ public class SessionManager : MonoBehaviour
       if (ArPlaneManager.trackables.count > requiredPlaneCount)
       {
          IsReadyToPlace = true;
-
          uiScanningPanel.SetActive(false);
          textInfo.gameObject.SetActive(false);
       }
       else
       {
          IsReadyToPlace = false;
-
          uiScanningPanel.SetActive(true);
          textInfo.gameObject.SetActive(true);
          textInfo.text = "Arahkan ponsel perlahan untuk mendeteksi permukaan";
       }
    }
-
-
 }
