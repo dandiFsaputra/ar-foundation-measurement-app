@@ -57,7 +57,7 @@ public class MeasureManager : MonoBehaviour
         // ------------------------------------------
 
         // pastikan ada mode aktif dan ada posisi valid dari PlaceManager
-        if (currentMode != null && PlaceManager.Instance != null && PlaceManager.Instance.HasValidPos)
+        if (currentMode != null && PlaceManager.Instance != null && PlaceManager.Instance.HasValidPos && SessionManager.Instance.IsReadyToPlace == true)
         {
             Vector3 worldPos = PlaceManager.Instance.CurrentPose.position;
             currentMode.OnTap(worldPos);
