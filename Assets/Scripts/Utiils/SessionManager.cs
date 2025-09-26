@@ -4,15 +4,20 @@ using UnityEngine.XR.ARFoundation;
 
 public class SessionManager : MonoBehaviour
 {
+   public static SessionManager Instance { get; private set; }
    [SerializeField] private GameObject uiScanningPanel;
    [SerializeField] private TextMeshProUGUI textInfo;
-   [SerializeField] private int requiredPlaneCount = 2;
+   [SerializeField] private int requiredPlaneCount;
+   public bool IsReadyToPlace { get; set; }
 
-   private ARPlaneManager arPlaneManager;
+
+
+   public ARPlaneManager ArPlaneManager { get; set; }
 
    void Awake()
    {
-      arPlaneManager = FindAnyObjectByType<ARPlaneManager>();
+      Instance = this;
+      ArPlaneManager = FindAnyObjectByType<ARPlaneManager>();
    }
 
    void Start()
@@ -22,12 +27,12 @@ public class SessionManager : MonoBehaviour
 
    void OnEnable()
    {
-      arPlaneManager.trackablesChanged.AddListener(OnPlanesChanged);
+      ArPlaneManager.trackablesChanged.AddListener(OnPlanesChanged);
    }
 
    void OnDisable()
    {
-      arPlaneManager.trackablesChanged.RemoveListener(OnPlanesChanged);
+      ArPlaneManager.trackablesChanged.RemoveListener(OnPlanesChanged);
    }
 
    private void OnPlanesChanged(ARTrackablesChangedEventArgs<ARPlane> args)
@@ -37,16 +42,22 @@ public class SessionManager : MonoBehaviour
 
    private void HandleUiInfoAr()
    {
-      if (arPlaneManager.trackables.count > requiredPlaneCount)
+      if (ArPlaneManager.trackables.count > requiredPlaneCount)
       {
+         IsReadyToPlace = true;
+
          uiScanningPanel.SetActive(false);
          textInfo.gameObject.SetActive(false);
       }
       else
       {
+         IsReadyToPlace = false;
+
          uiScanningPanel.SetActive(true);
          textInfo.gameObject.SetActive(true);
          textInfo.text = "Arahkan ponsel perlahan untuk mendeteksi permukaan";
       }
    }
+
+
 }

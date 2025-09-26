@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;  
+using UnityEngine.XR.ARSubsystems;
 using System.Collections.Generic;
 
 public class PlaceManager : MonoBehaviour
@@ -20,7 +20,8 @@ public class PlaceManager : MonoBehaviour
 
     private void Update()
     {
-        List<ARRaycastHit> hits = new List<ARRaycastHit>(); 
+        bool isSessionReady = SessionManager.Instance != null && SessionManager.Instance.IsReadyToPlace;
+        List<ARRaycastHit> hits = new List<ARRaycastHit>();
         //titik tengah layar
         Vector2 screenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
 
@@ -28,9 +29,9 @@ public class PlaceManager : MonoBehaviour
         if (arRaycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
         {
             CurrentPose = hits[0].pose;
-            HasValidPos = true; 
+            HasValidPos = true;
 
-            if (!indicatorPlane.activeSelf)
+            if (isSessionReady && !indicatorPlane.activeSelf)
             {
                 indicatorPlane.SetActive(true);
             }
@@ -45,6 +46,12 @@ public class PlaceManager : MonoBehaviour
                 HasValidPos = false;
                 indicatorPlane.SetActive(false);
             }
+        }
+
+        if (!isSessionReady && indicatorPlane.activeSelf)
+        {
+            indicatorPlane.SetActive(false);
+            HasValidPos = false;
         }
     }
 }
